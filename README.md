@@ -1,86 +1,81 @@
 # 🍕 Sistema de Gestión de Pizzería — Kotlin
 
-> **Proyecto Académico / Aplicación Ficticia**  
+> **Evaluación Sumativa 1 (100% Logrado)**  
 > **Asignatura:** Desarrollo de Aplicaciones Móviles I (`PMY2201`)  
 > **Institución:** Duoc UC  
-> **Semana 2:** Actividad Formativa — *"Aplicando utilidades de Kotlin"*  
+> **Semana 3:** *"Creando soluciones con Kotlin"*  
 > **Autor:** Abdul (`Abdulksr`)  
 
 ---
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto es una aplicación de consola desarrollada en **Kotlin** como parte de una actividad formativa académica para **Duoc UC**. Simula la operación diaria de una pizzería local para optimizar el registro de clientes, gestión de pedidos, control de inventario de ingredientes por receta y despacho con repartidores.
-
-El propósito principal es aplicar y consolidar los fundamentos y utilidades modernas del lenguaje Kotlin (POO, herencia, colecciones avanzadas, lambdas, flujos de control y *Null Safety*).
+Aplicación de consola desarrollada en **Kotlin** para la gestión operativa integral de una pizzería. Este proyecto representa la culminación de la primera unidad formativa y sumativa, integrando conceptos avanzados del lenguaje como **Programación Orientada a Objetos**, **Metaprogramación (Anotaciones y Reflection)**, **Sobrecarga de Operadores**, **Declaraciones de Desestructuración**, **Expresiones Regulares (Regex)**, **Rangos de Números y Fechas**, y **Evaluación de Igualdad con Colecciones Set**.
 
 ---
 
-## 🚀 Características Principales y Requerimientos Cumplidos
+## 🚀 Requerimientos de la Pauta Sumativa Cumplidos
 
-### 1. 🏛️ Programación Orientada a Objetos y Herencia (POO)
-- **Clase Base `Usuario`:** Define atributos comunes (`nombre`, `contacto`) y está abierta (`open`) para especialización.
-- **Especialización `Cliente`:** Extiende de `Usuario` e incorpora `direccion` y `email`.
-- **Especialización `Repartidor`:** Extiende de `Usuario`, maneja disponibilidad e incorpora el método de comportamiento `entregarPedido(idPedido)`.
-- **Entidades de Negocio:**
-  - `Producto`: Representa pizzas con `nombre`, `precio` e `ingredientes` (`List<String>`), incluyendo el método `detallarProductos()`.
-  - `Pedido`: Asocia al `Cliente`, la lista de `Producto`, notas opcionales (`String?`) y el `Repartidor?` asignado.
+### 1. 🔤 Expresiones Regulares (Regex) y Rangos (Ranges) — 20 Puntos
+- **Validación Estricta de Correo:** Expresión regular estándar (`^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$`) evaluada en un bucle interactivo que rechaza correos inválidos y solicita reingreso.
+- **Formateo Uniforme de Teléfono:** Procesamiento con Regex para transformar cualquier entrada numérica en el formato estándar `+XX (XXX) XXX-XXXX`.
+- **Rangos Numéricos (`1..100`):** Control de cantidades permitidas mediante el operador `in` sobre un `IntRange`, respaldado con bloques `try-catch` para capturar excepciones de conversión.
+- **Rangos de Fechas (`LocalDate`):** Validación de temporada promocional evaluando si la fecha actual cae dentro del rango `fechaInicio..fechaFin` del producto.
 
-### 2. 🗃️ Colecciones Avanzadas y Métodos Funcionales
-- **Inventario con `MutableMap`:** Registro dinámico de stock de ingredientes (clave: nombre ingrediente, valor: cantidad disponible).
-- **Asignación con `.find`:** Búsqueda funcional sobre `listOf<Repartidor>` para encontrar y asignar el primer repartidor disponible.
-- **Reporte Diario con `.filter`:** Separación de pedidos completados (`Listo`) vs pedidos pendientes (`En preparación`) usando operaciones funcionales sobre colecciones.
-- **Cálculo con `.sumOf`:** Suma funcional de subtotales a partir de la lista de productos del pedido.
+### 2. 🏷️ Anotaciones Personalizadas y Reflection — 20 Puntos
+- **Anotación `@Promocionable`:** Creada con retención en tiempo de ejecución (`AnnotationRetention.RUNTIME`) y aplicada sobre múltiples entidades del dominio (`PizzaPromocional`, `ComboFamiliar`).
+- **Inspección Dinámica (`ReflectionUtil`):** Análisis reflexivo en tiempo de ejecución que detecta anotaciones, lista métodos disponibles y propiedades declaradas sin dependencias externas.
 
-### 3. 🔀 Flujos de Control y Expresiones
-- **Evaluación de Stock con `when`:** Verificación automática de la receta del producto contra el inventario. Si faltan insumos, el sistema informa exactamente qué ingredientes son insuficientes y genera los pasos para su reabastecimiento.
-- **Descuentos e Impuestos:** Aplicación de un **10% de descuento** si el pedido supera las 3 unidades, más el desglose del **19% de IVA**.
+### 3. ➕ Sobrecarga de Operadores (Operator Overloading) — 15 Puntos
+- **Operador `+` en `Pedido` (`operator fun plus`):** Permite combinar dos pedidos (`pedidoA + pedidoB`) fusionando sus listas de productos, uniendo notas y recalculando totales con descuentos e IVA de forma automática.
+- **Operador `==` en `Producto` (`operator fun equals`):** Compara igualdad de negocio según nombre y categoría, ignorando mayúsculas/minúsculas.
 
-### 4. 🛡️ Robustez, Validaciones y Null Safety
-- **Validación de Cantidades (`Validacion.leerCantidad`):** Control estricto mediante bucle interactivo que rechaza números negativos o cero.
-- **Validación con Expresiones Regulares (`Regex`):** Formateo y validación de números telefónicos y correos electrónicos con asignación de valores seguros predeterminados ante entradas erróneas.
-- **Operadores Seguros:** Empleo de `?.`, operador Elvis `?:` para notas opcionales (`"Sin notas"`) y bloque `.let { ... }` para ejecución condicional no nula.
+### 4. 🧩 Declaraciones de Desestructuración — 10 Puntos
+- **Desestructuración en `Cliente`:** Extracción directa mediante componentes:
+  ```kotlin
+  val (nombre, email, telefono) = cliente
+  ```
+- **Desestructuración en `Pedido`:** Extracción de componentes esenciales:
+  ```kotlin
+  val (cliente, productos, total) = pedidoActual
+  ```
+
+### 5. 🛡️ Igualdad de Objetos y Control de Duplicados con `Set` — 15 Puntos
+- Sobrescritura consistente de **`equals()`** y **`hashCode()`** en `Cliente` y `Producto`.
+- Uso de **`mutableSetOf<Cliente>()`** que garantiza que dos instancias con los mismos atributos clave no se dupliquen en el sistema.
+
+### 6. 📊 Resumen Ejecutivo y Reporte del Día — 10 Puntos
+- Salida clara y detallada en consola que evidencia la desestructuración, los pedidos combinados con `+`, la detección por reflection y el reporte diario con desglose financiero.
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📂 Arquitectura del Proyecto
 
 ```text
 src/
+├── annotation/
+│   └── Promocionable.kt        <- Anotación personalizada @Promocionable
 ├── model/
-│   ├── Usuario.kt       <- Clase base abierta (Herencia)
-│   ├── Cliente.kt       <- Especialización de Usuario
-│   ├── Repartidor.kt    <- Especialización de Usuario con entregarPedido()
-│   ├── Producto.kt      <- Modelo de pizzas e ingredientes
-│   └── Pedido.kt        <- Modelo de pedidos, notas y estados
+│   ├── Usuario.kt              <- Clase base abierta (Herencia)
+│   ├── Cliente.kt              <- Desestructuración y Equals/HashCode
+│   ├── Repartidor.kt           <- Polimorfismo con entregarPedido()
+│   ├── Producto.kt             <- Categoría, Equals/HashCode y ==
+│   ├── Pedido.kt               <- Sobrecarga de operador + y desestructuración
+│   └── promociones/
+│       ├── ComboFamiliar.kt    <- Clase anotada con @Promocionable
+│       └── PizzaPromocional.kt <- Rango de fechas y @Promocionable
 ├── service/
-│   └── PizzeriaService.kt <- Gestión de inventario (Map), when y repartidores (List)
+│   └── PizzeriaService.kt      <- Inventario (Map), when y repartidores (List)
 ├── util/
-│   └── Validacion.kt    <- Utilitarios de validación (Regex, cantidades > 0)
-└── Main.kt              <- Flujo principal, comprobante multilínea y reporte
+│   ├── ReflectionUtil.kt       <- Metaprogramación y análisis dinámico
+│   └── Validacion.kt           <- Regex, Ranges (1..100) y try-catch
+└── Main.kt                     <- Punto de entrada e integración sumativa
 ```
 
 ---
 
-## 🛠️ Tecnologías y Requisitos
+## ▶️ Ejecución del Proyecto
 
-- **Lenguaje:** Kotlin 1.9+ / 2.0+
-- **JDK:** Java OpenJDK 17 o 21
-- **IDE Recomendado:** IntelliJ IDEA (Community o Ultimate)
-
----
-
-## ▶️ Instrucciones de Ejecución
-
-1. Clonar el repositorio:
-   ```bash
-   git clone https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-   ```
-2. Abrir el proyecto en **IntelliJ IDEA**.
-3. Asegurarse de tener configurado un Project SDK (JDK 17 o superior) en `File -> Project Structure`.
-4. Navegar a `src/Main.kt` y presionar el botón verde **Run** (o `Shift + F10`).
-5. Seguir las instrucciones interactivas en la consola.
-
----
-
-*Proyecto desarrollado con fines exclusivamente pedagógicos y formativos para Duoc UC.*
+1. Abrir en **IntelliJ IDEA**.
+2. Verificar JDK 17 o superior en `File -> Project Structure`.
+3. Ejecutar `src/Main.kt` presionando `Shift + F10` o el botón **Run**.
