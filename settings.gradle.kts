@@ -24,3 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "PizzeriaApp"
 include(":app")
+include(":utils")
+include(":data")
+include(":ui")
