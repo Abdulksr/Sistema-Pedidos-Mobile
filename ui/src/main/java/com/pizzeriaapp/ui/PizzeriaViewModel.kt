@@ -14,7 +14,50 @@ import com.pizzeriaapp.utils.Validacion
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+enum class PantallaApp(val titulo: String) {
+    RESUMEN("Resumen General"),
+    CLIENTES("Gestión de Clientes"),
+    PRODUCTOS("Catálogo de Productos"),
+    PEDIDOS("Registro y Pedidos")
+}
+
 class PizzeriaViewModel : ViewModel() {
+
+    private val _pantallaActual = MutableLiveData(PantallaApp.RESUMEN)
+    val pantallaActual: LiveData<PantallaApp> = _pantallaActual
+
+    private val _cargando = MutableLiveData(false)
+    val cargando: LiveData<Boolean> = _cargando
+
+    private val _mensajeProgreso = MutableLiveData("")
+    val mensajeProgreso: LiveData<String> = _mensajeProgreso
+
+    // Carga inicial simulada al abrir la app ("Generando resumen...")
+    init {
+        recargarResumen()
+    }
+
+    fun recargarResumen() {
+        viewModelScope.launch {
+            _cargando.value = true
+            _mensajeProgreso.value = "Generando resumen del sistema..."
+            delay(1200)
+            _cargando.value = false
+            _mensajeProgreso.value = ""
+        }
+    }
+
+    fun navegarA(destino: PantallaApp) {
+        if (_pantallaActual.value == destino) return
+        viewModelScope.launch {
+            _cargando.value = true
+            _mensajeProgreso.value = "Cargando ${destino.titulo.lowercase()}..."
+            delay(800)
+            _pantallaActual.value = destino
+            _cargando.value = false
+            _mensajeProgreso.value = ""
+        }
+    }
 
     private val servicio = PizzeriaService()
 
@@ -87,40 +130,62 @@ class PizzeriaViewModel : ViewModel() {
                 _mensajeEstado.value = "Error: Ingresa el nombre del cliente."
                 return@launch
             }
+            if (direccion.isBlank()) {
+                _mensajeEstado.value = "Error: Ingresa la dirección de entrega."
+                return@launch
+            }
+            val telFormateado = Validacion.formatearTelefonoSiValido(telefono)
+            if (telFormateado == null) {
+                _mensajeEstado.value =
+                    "Error: Ingresa un teléfono válido (mínimo 11 dígitos, ej.56912345678)."
+                return@launch
+            }
             if (!Validacion.esEmailValido(email)) {
                 _mensajeEstado.value = "Error: Correo inválido (ej. nombre@dominio.com)."
                 return@launch
             }
-            val telFormateado =
-                Validacion.formatearTelefonoSiValido(telefono) ?: "+56 (900) 000-000"
+            if (!Validacion.esCantidadValida(cantidad)) {
+                _mensajeEstado.value = "Error: La cantidad debe ser un número entre 1 y 100."
+                return@launch
+            }
 
-            _mensajeEstado.value = "Procesando pedido..."
-            delay(300) // Simula procesamiento asíncrono con corrutina
+            _cargando.value = true
+            try {
+                _mensajeProgreso.value = "Guardando nuevo pedido..."
+                delay(1000)
 
-            val nuevoCliente = Cliente(
-                nombre = nombre.trim(),
-                contacto = telFormateado,
-                direccion = direccion.ifBlank { "Sin dirección" },
-                email = email.trim()
-            )
+                val nuevoCliente = Cliente(
+                    nombre = nombre.trim(),
+                    contacto = telFormateado,
+                    direccion = direccion.trim(),
+                    email = email.trim()
+                )
 
-            val listaActualClientes = _clientes.value.orEmpty()
-            val listaActualPedidos = _pedidos.value.orEmpty()
+                val listaActualClientes = _clientes.value.orEmpty()
+                val listaActualPedidos = _pedidos.value.orEmpty()
 
-            val nuevoPedido = Pedido(
-                idPedido = 101 + listaActualPedidos.size,
-                cliente = nuevoCliente,
-                productos = List(cantidad.coerceIn(1, 100)) { producto },
-                estado = "En preparación",
-                repartidor = servicio.obtenerRepartidorDisponible()
-            )
+                val nuevoPedido = Pedido(
+                    idPedido = 101 + listaActualPedidos.size,
+                    cliente = nuevoCliente,
+                    productos = List(cantidad) { producto },
+                    estado = "En preparación",
+                    repartidor = servicio.obtenerRepartidorDisponible()
+                )
 
-            // 1. Actualiza los 3 LiveData para que la pantalla se redibuje dinámicamente:
-            _clientes.value = listaActualClientes + nuevoCliente
-            _pedidos.value = listaActualPedidos + nuevoPedido
-            _ultimoCliente.value = nuevoCliente.nombre
-            _mensajeEstado.value =
-                "Pedido #${nuevoPedido.idPedido} registrado para ${nuevoCliente.nombre}."
+                // Evita clientes duplicados usando equals() de Cliente
+                _clientes.value = if (nuevoCliente !in listaActualClientes) {
+                    listaActualClientes + nuevoCliente
+                } else {
+                    listaActualClientes
+                }
+                _pedidos.value = listaActualPedidos + nuevoPedido
+                _ultimoCliente.value = nuevoCliente.nombre
+                _mensajeEstado.value =
+                    "Pedido #${nuevoPedido.idPedido} registrado para ${nuevoCliente.nombre}."
+            } finally {
+                _cargando.value = false
+                _mensajeProgreso.value = ""
+            }
         }
     }
 }

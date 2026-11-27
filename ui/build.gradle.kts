@@ -45,4 +45,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.kotlinx.coroutines.android)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.material.icons.core)
 }

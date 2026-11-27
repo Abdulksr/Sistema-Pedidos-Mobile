@@ -20,12 +20,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             PizzeriaAppTheme {
                 val pizzeriaViewModel: PizzeriaViewModel = viewModel()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PizzeriaScreen(
-                        viewModel = pizzeriaViewModel,
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                PizzeriaScreen(
+                    viewModel = pizzeriaViewModel,
+                )
             }
         }
     }

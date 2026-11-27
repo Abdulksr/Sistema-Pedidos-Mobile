@@ -1,22 +1,22 @@
 # 🍕 PizzeriaApp — Aplicación Móvil Android en Kotlin (Multimódulo)
 
-> **Proyecto Académico / Aplicación Ficticia**  
+> **Evaluación Sumativa 2 — Experiencia 2 (Semana 6)**  
 > **Asignatura:** Desarrollo de Aplicaciones Móviles I (`PMY2201`)  
 > **Institución:** Duoc UC  
-> **Experiencia 2 (Semanas 4 y 5):** *"Integrando Kotlin en Android Studio"*  
+> **Actividad:** *"Avanzando hacia Android Studio"*  
 > **Autor:** Abdul (`Abdulksr`)  
 
 ---
 
 ## 📋 Descripción del Proyecto
 
-**PizzeriaApp** es una aplicación móvil Android desarrollada en **Kotlin** con **Android Studio** y **Jetpack Compose (Material Design 3)**. Representa la evolución a entorno móvil real del sistema de gestión de una pizzería local, aplicando una **arquitectura multimódulo con Gradle**, manejo reactivo de estado mediante **ViewModel + LiveData** y operaciones asíncronas con **Kotlin Coroutines**.
+**PizzeriaApp** es una aplicación móvil Android desarrollada en **Kotlin** con **Android Studio** y **Jetpack Compose (Material Design 3)**. Implementa una **arquitectura multimódulo con Gradle**, gestión reactiva de estado con **ViewModel + LiveData**, operaciones asíncronas con **Kotlin Coroutines**, **animaciones Fade In/Out (`AnimatedVisibility`)**, **menú desplegable con íconos (`DropdownMenu`)** y **notificaciones de progreso dinámicas (`CircularProgressIndicator`)**.
 
 ---
 
 ## 🏗️ Arquitectura Multimódulo (Gradle Kotlin DSL)
 
-El proyecto está organizado en **4 módulos Gradle** declarados en `settings.gradle.kts` con dependencias unidireccionales (sin ciclos):
+El proyecto separa responsabilidades en **4 módulos Gradle** declarados en `settings.gradle.kts` con flujo de dependencias unidireccional:
 
 ```text
 :app  ──▶  :ui  ──▶  :data  ──▶  :utils
@@ -25,68 +25,68 @@ El proyecto está organizado en **4 módulos Gradle** declarados en `settings.gr
 ```text
 PizzeriaApp/
 ├── gradle/
-│   └── libs.versions.toml         <- Catálogo centralizado de versiones y librerías
-├── settings.gradle.kts            <- Definición de módulos (:app, :utils, :data, :ui)
-├── utils/                         <- Módulo de Utilidades (com.pizzeriaapp.utils)
+│   └── libs.versions.toml                  <- Catálogo centralizado de librerías y versiones
+├── settings.gradle.kts                     <- Inclusión de :app, :utils, :data y :ui
+├── utils/                                  <- Módulo de Utilidades (com.pizzeriaapp.utils)
 │   └── src/main/java/com/pizzeriaapp/utils/
-│       ├── annotation/Promocionable.kt  <- Anotación personalizada @Promocionable
-│       ├── ReflectionUtil.kt            <- Inspección dinámica por Reflection
-│       └── Validacion.kt                <- Validaciones con Regex y formateo de teléfono
-├── data/                          <- Módulo de Datos y Dominio (com.pizzeriaapp.data)
+│       ├── annotation/Promocionable.kt     <- Anotación personalizada @Promocionable
+│       ├── ReflectionUtil.kt               <- Inspección dinámica por Reflection
+│       └── Validacion.kt                   <- Validaciones puras Android (Regex correo, teléfono, rango 1..100)
+├── data/                                   <- Módulo de Datos y Dominio (com.pizzeriaapp.data)
 │   └── src/main/java/com/pizzeriaapp/data/
-│       ├── model/
-│       │   ├── Usuario.kt               <- Clase base abierta (Herencia)
-│       │   ├── Cliente.kt               <- Desestructuración, equals y hashCode
-│       │   ├── Repartidor.kt            <- Especialización con entregarPedido()
-│       │   ├── Producto.kt              <- Modelo de productos y categorías
-│       │   ├── Pedido.kt                <- Cálculo de totales, operador + y desestructuración
-│       │   └── promociones/
-│       │       ├── ComboFamiliar.kt     <- Producto @Promocionable con rango de fechas (Date)
-│       │       └── PizzaPromocional.kt  <- Producto @Promocionable con rango de fechas (Date)
-│       └── service/
-│           └── PizzeriaService.kt       <- Inventario (MutableMap), when y repartidores
-├── ui/                            <- Módulo de Interfaz y Estado (com.pizzeriaapp.ui)
+│       ├── model/                          <- Usuario, Cliente, Repartidor, Producto, Pedido y Promociones (Date)
+│       └── service/PizzeriaService.kt      <- Inventario (MutableMap), when y repartidores
+├── ui/                                     <- Módulo de Interfaz y Estado (com.pizzeriaapp.ui)
 │   └── src/main/java/com/pizzeriaapp/ui/
-│       ├── PizzeriaViewModel.kt         <- ViewModel + LiveData + Coroutines (viewModelScope)
-│       └── PizzeriaScreen.kt            <- Pantalla en Jetpack Compose (Material 3)
-└── app/                           <- Módulo Principal Android (com.pizzeriaapp)
+│       ├── PizzeriaViewModel.kt            <- PantallaApp (enum), ViewModel, LiveData, Coroutines y estados de carga
+│       └── PizzeriaScreen.kt               <- TopAppBar + DropdownMenu + AnimatedVisibility + ProgressIndicator
+└── app/                                    <- Módulo Principal Android (com.pizzeriaapp)
     └── src/main/java/com/pizzeriaapp/
-        ├── MainActivity.kt              <- Punto de entrada que conecta ViewModel y Compose
-        └── ui/theme/                    <- Tema visual Material 3 (Color, Theme, Type)
+        ├── MainActivity.kt                 <- Punto de entrada Jetpack Compose
+        └── ui/theme/                       <- Tema Material Design 3
 ```
 
 ---
 
-## 🚀 Funcionalidades Implementadas
+## 🚀 Funcionalidades de la Semana 6 (Sumativa)
 
-- **Resumen Dinámico en Pantalla:** Muestra en tiempo real el total de clientes registrados, total de pedidos realizados y el nombre del último cliente registrado, actualizándose automáticamente vía `LiveData.observeAsState()`.
-- **Registro Interactivo de Clientes y Pedidos:** Formulario en Jetpack Compose con validaciones de correo (`Regex`) y formateo de teléfono mediante el módulo `:utils`, procesado de forma asíncrona con **Kotlin Coroutines (`viewModelScope.launch`)**.
-- **Visualización Dinámica de Pedidos:** Lista reactiva en `LazyColumn` con claves únicas (`key = { it.idPedido }`) mostrando cliente, contacto, cantidad de productos, total calculado con IVA/descuento y estado del pedido.
-- **Compatibilidad Android (`minSdk = 24`):** Uso de `java.util.Date` con rangos de fechas (`in fechaInicio..fechaFin`) para compatibilidad desde Android 7.0 en adelante.
+### 1. ✨ Animaciones Fade In / Fade Out (`AnimatedVisibility`)
+- **Fade In al iniciar:** `LaunchedEffect(Unit)` activa `pantallaIniciada = true` con `fadeIn(animationSpec = tween(600))`.
+- **Fade Out / Fade In al navegar:** Las transiciones entre las 4 pantallas (`RESUMEN`, `CLIENTES`, `PRODUCTOS`, `PEDIDOS`) y entre el estado de carga y contenido se controlan con `AnimatedVisibility` (`fadeIn` / `fadeOut`).
+
+### 2. ☰ Menú Interactivo Desplegable (`DropdownMenu` en `TopAppBar`)
+- Barra superior Material 3 (`TopAppBar`) con botón de recarga (`Icons.Default.Refresh`) y botón de menú (`Icons.Default.Menu`).
+- `DropdownMenu` con íconos representativos (`Home`, `Person`, `List`, `ShoppingCart`) que navegan dinámicamente entre **Resumen General**, **Gestión de Clientes**, **Catálogo de Productos** y **Registro y Pedidos**.
+
+### 3. ⏳ Notificaciones de Progreso (`CircularProgressIndicator`)
+- Controladas mediante `LiveData` (`cargando: LiveData<Boolean>`, `mensajeProgreso: LiveData<String>`) y **Kotlin Coroutines (`viewModelScope.launch`)** con cierre seguro en bloque `try / finally`.
+- Mensajes contextuales en pantalla:
+  - *"Generando resumen del sistema..."* (al abrir o recargar)
+  - *"Cargando gestión de clientes / catálogo de productos / registro y pedidos..."* (al navegar)
+  - *"Guardando nuevo pedido..."* (al registrar un nuevo pedido)
 
 ---
 
-## 🛠️ Stack Técnico
+## 🧪 Validación y Pruebas
 
-- **Lenguaje:** Kotlin (`2.2.10`)
-- **UI:** Jetpack Compose + Material Design 3 + `runtime-livedata`
-- **Arquitectura:** AndroidX `ViewModel` + `LiveData`
-- **Asincronía:** `kotlinx-coroutines-core` / `kotlinx-coroutines-android`
-- **Build System:** Gradle Kotlin DSL + Version Catalog (`libs.versions.toml`)
-- **SDK:** `minSdk = 24` | `targetSdk = 37`
+| Caso Probado | Acción Ejecutada | Resultado Verificado |
+| :--- | :--- | :--- |
+| **Compilación Multimódulo** | `./gradlew assembleDebug` en `:utils`, `:data`, `:ui`, `:app` | ✅ `BUILD SUCCESSFUL` sin errores |
+| **Carga Inicial y Fade In** | Abrir la app en AVD (API 31+) | ✅ Muestra *"Generando resumen del sistema..."* con `CircularProgressIndicator` y luego entra el Resumen con *Fade In* |
+| **Menú y Navegación** | Abrir `DropdownMenu` y seleccionar Clientes / Productos / Pedidos | ✅ Transición suave *Fade Out → Carga → Fade In* con actualización de título en `TopAppBar` |
+| **Registro Dinámico** | Ingresar cliente válido en *Registro y Pedidos* y pulsar *Guardar Pedido* | ✅ Muestra *"Guardando nuevo pedido..."*, agrega el pedido a la lista y actualiza el Resumen General |
+| **Validación de Errores** | Ingresar nombre vacío o correo sin `@` | ✅ Muestra mensaje de error en pantalla sin colapsar |
 
 ---
 
-## ▶️ Cómo Ejecutar el Proyecto
+## ▶️ Cómo Ejecutar
 
 1. Clonar el repositorio:
    ```bash
    git clone https://github.com/Abdulksr/Sistema-Pedidos-Mobile.git
    ```
-2. Abrir la carpeta del proyecto en **Android Studio**.
-3. Esperar a que **Gradle Sync** descargue las dependencias de los 4 módulos.
-4. Seleccionar un **Android Virtual Device (AVD)** (API 31 o superior) o un dispositivo físico.
-5. Presionar **Run (▶)** para compilar e instalar la aplicación.
+2. Abrir en **Android Studio** y esperar a que termine **Gradle Sync**.
+3. Ejecutar sobre un **AVD (API 31+)** o dispositivo físico presionando **Run (▶)**.
 
 ---
 
